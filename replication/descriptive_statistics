@@ -1,0 +1,49 @@
+#setwd("C:/Users/Markus/OneDrive/2_Desmarais/Barbera_Replication")
+setwd("/gpfs/home/mvn5218/Barbera_Replication")
+
+library(network)
+library(igraph)
+library(ggplot2)
+set.seed(123)
+
+matrixfile <- 'output/adj-matrix-US.rdata'
+results1 <- 'output/users-data-US.rdata'
+results2 <- 'output/results-elites-US.rdata'
+
+load(matrixfile)
+twitter_users <- as.matrix(y)
+
+#sort by row name so that later it is easier to assign values (for example estimates from the latent variable model) to the vertices
+twitter_users <- twitter_users[order(rownames(twitter_users)), ]
+
+#create igraph object from incidence matrix
+g <- graph_from_incidence_matrix(twitter_users)
+
+#betweenness centrality density plot
+#calculate only for politicians because they are the only interesting ones
+#(plus, it takes even the HPC hours to do only these)
+bet <- as.data.frame(betweenness(g, directed = F, v = V(g)[(length(V(g))-317):length(V(g))])) #DON'T RUN THIS LINE UNLESS YOU'VE GOT TIME
+save(bet, file="output/bet.Rdata")
+load("output/bet.Rdata")
+names(bet) <- "Betweenness"
+bet <- log(bet)
+betplot <- ggplot(bet, aes(Betweenness)) + geom_density() + labs(x = "Values of betweenness centrality (log. scale)", y="Density", title = "Betweenness centrality")
+betplot
+ggsave(filename="plots/betweenness.pdf", plot=betplot, height=3.5, width=7)
+
+#transitivity - kind of pointless in a bipartite graph though
+transitivity(g, type = "global")
+
+#degree assortativity
+assortativity.degree(g,directed=F)
+
+#assortativity by ideology score:
+load(results1) #load users estimates
+load(results2) #load elite estimates
+
+V(g)$theta[1:301537] <- users$theta #assign users estimates to igraph object
+V(g)$theta[301538:length(V(g))] <- results$phi #assign elites estimates to igraph object
+#Note: it's not really necessary to assign them to the igraph object, I could also just have made some other vector, but I just prefer this way ;-)
+
+#assortativity by ideology score
+assortativity(g, types1=V(g)$theta, directed = F)
