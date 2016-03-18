@@ -13,7 +13,13 @@
 
 source('functions.R')
 library(rstan)
+#rstan_options(auto_write = TRUE)
+#options(mc.cores = parallel::detectCores())
 library(parallel)
+library(arm)
+library(boot)
+library(coda)
+library(R2WinBUGS)
 
 matrixfile <- 'output/adj-matrix-US.rdata'
 samplesfile <- 'output/samples-US.rdata'
@@ -133,7 +139,12 @@ n2 <- 50000
 ## preparing data
 load(matrixfile)
 y <- y[n1:(n1+49999),]
+#results1 <- mclapply(seq(n1,n2,5000), estimation)
+#results1 <- mclapply(seq(n1,n2,5000), estimation, mc.cores=1)
+#results1 <- mclapply(seq(n1,n2,5000), estimation, mc.cores=2)
+#results1 <- mclapply(seq(n1,n2,5000), estimation, mc.cores=4)
 results1 <- mclapply(seq(n1,n2,5000), estimation, mc.cores=12)
+#results1 <- mclapply(seq(n1,n2,5000), estimation, mc.cores = parallel::detectCores())
 save(results1, file="temp/results1.Rdata")
 
 # repeat code above for results 2 to 6
@@ -141,6 +152,9 @@ n1 <- 50001
 n2 <- 100000
 load(matrixfile)
 y <- y[n1:(n1+49999),]
+n1 <- 1
+n2 <- 50000
+#results2 <- mclapply(seq(n1,n2,5000), estimation, mc.cores=1)
 results2 <- mclapply(seq(n1,n2,5000), estimation, mc.cores=12)
 save(results2, file="temp/results2.Rdata")
 
@@ -148,6 +162,9 @@ n1 <- 100001
 n2 <- 150000
 load(matrixfile)
 y <- y[n1:(n1+49999),]
+n1 <- 1
+n2 <- 50000
+#results3 <- mclapply(seq(n1,n2,5000), estimation, mc.cores=1)
 results3 <- mclapply(seq(n1,n2,5000), estimation, mc.cores=12)
 save(results3, file="temp/results3.Rdata")
 
@@ -156,6 +173,9 @@ n1 <- 150001
 n2 <- 200000
 load(matrixfile)
 y <- y[n1:(n1+49999),]
+n1 <- 1
+n2 <- 50000
+#results4 <- mclapply(seq(n1,n2,5000), estimation, mc.cores=1)
 results4 <- mclapply(seq(n1,n2,5000), estimation, mc.cores=12)
 save(results4, file="temp/results4.Rdata")
 
@@ -163,6 +183,8 @@ n1 <- 200001
 n2 <- 250000
 load(matrixfile)
 y <- y[n1:(n1+49999),]
+n1 <- 1
+n2 <- 50000
 results5 <- mclapply(seq(n1,n2,5000), estimation, mc.cores=12)
 save(results5, file="temp/results5.Rdata")
 
@@ -170,6 +192,8 @@ n1 <- 250001
 n2 <- 300000
 load(matrixfile)
 y <- y[n1:(n1+49999),]
+n1 <- 1
+n2 <- 50000
 results6 <- mclapply(seq(n1,n2,5000), estimation, mc.cores=12)
 save(results6, file="temp/results6.Rdata")
 
@@ -177,7 +201,7 @@ save(results6, file="temp/results6.Rdata")
 load(matrixfile)
 y <- y[300001:dim(y)[1],]
 results7 <- estimation(first=1, last=dim(y)[1])
-
+save(results7, file="temp/results7.Rdata")
 
 #####################################################################
 ##### PUTTING IT ALL TOGETHER
@@ -339,8 +363,6 @@ results <- list(
     )
 
 save(results, file=resultsfile)
-
-
 
 
 
