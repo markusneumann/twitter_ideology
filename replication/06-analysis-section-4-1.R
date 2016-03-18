@@ -147,8 +147,9 @@ d2$x <- 0
 d2 <- d2[order(d2$med),]
 
 p <- ggplot(data=d2, aes(y=med, x=x, shape=factor(party)))
-pq2 <- p + geom_linerange(width=.5, aes(ymin=lo, ymax=up), color="grey20") + 
-        geom_point(aes(shape=factor(party))) + 
+pq2 <- p + geom_linerange(aes(ymin=lo, ymax=up), color="grey20") + 
+#pq2 <- p + geom_linerange(width=.5, aes(ymin=lo, ymax=up), color="grey20") + 
+geom_point(aes(shape=factor(party))) + 
         scale_x_continuous(limits=c(-0.07,0.06), expand=c(0,0)) + 
             scale_y_continuous(expression(paste(phi[j], ", Estimated Twitter Ideal Points")), limits=c(-2.1, 2.4)) +
             theme_bw() + coord_flip() +
@@ -161,7 +162,8 @@ pq2 <- p + geom_linerange(width=.5, aes(ymin=lo, ymax=up), color="grey20") +
         axis.title.y = element_blank(), 
         panel.border = element_blank(), 
         panel.grid = element_blank(),
-        legend.margin=unit(-0.75, "cm"),
+        legend.margin=unit(-0.05, "cm"),
+        #legend.margin=unit(-0.75, "cm"),
         plot.margin=unit(c(0.30, 0.75, 0.10, 1), "cm")) +
         geom_vline(xintercept=0, alpha=1/3, size=0.2)
 
